@@ -11,16 +11,11 @@ void loop() {
 
   PORTB |= (1<<PB5);
 
-
-  
   for(i=0; i<cont; i++){
     asm ( "nop \n");
   }
-  
 
   PORTB &= ~(1<<PB5);
-
-
 
   for(i=0; i<cont; i++){
     asm ( "nop \n");
