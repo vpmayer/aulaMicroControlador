@@ -3,7 +3,7 @@
 
 ## Setup inicial
 
-* cada pasta possui um programa de referencia;
+* Cada pasta possui um programa de referencia;
 * Alguns programas possuem o arquivo`*.dasm` para demostrar o Assemble do programa;
 
 
