@@ -22,6 +22,7 @@ void setup() {
 void loop() {
 
   if((millis()-time) > 500){
+    time = millis();
   	if((PIND&(1<<PIND7)) == 0){
   		if(++disp0 > 9){
   			disp0 = 0;
