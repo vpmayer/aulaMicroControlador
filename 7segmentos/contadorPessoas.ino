@@ -40,8 +40,6 @@ void setup() {
 }
 
 
-
-
 void loop() {
 
 	contPessoa(pessoa);
