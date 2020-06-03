@@ -51,8 +51,8 @@ float convertTmp(int tmp){
 	// Delta = 10 mV/°C
 	// t(v) = (V/0.01) - 50
 	
-
-	// adc = (Vin * 1024)/ Vref
+	// resolução = 5.0/1024 => aproximadamente 0.005volt/adc
+	// adc = (Vin * 1024)/ Vre 
 	// Vin = (adc*Vref)/1024
 	V = (float)tmp; 
 	V = (V * Vref);
