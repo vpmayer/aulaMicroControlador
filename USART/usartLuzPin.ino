@@ -18,9 +18,8 @@ void setup() {
 
 
 void loop() {
- 
-  if (Serial.available() > 0) {
 
+  if (Serial.available() > 0) {
     Serial.print("Recebi um ");
     serialRX = Serial.read();
     Serial.println(serialRX);
@@ -54,6 +53,8 @@ void loop() {
     default:
       Serial.println("Comando não reconhecido.");
       Serial.println("Digite R, G ou B");
+      serialRX = 0;
+      delay(1000);
       break;
   }
 
