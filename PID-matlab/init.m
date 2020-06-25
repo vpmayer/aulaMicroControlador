@@ -25,3 +25,6 @@ KpR = Tr / ((Tr/4)*Kr);
 KiR = 1 / Tr;
 KdR = 0;
 
+ts = 0.1;
+
+
