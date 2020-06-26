@@ -13,11 +13,12 @@ int manipulated = 0;
 int processVariable = 0;
 
 unsigned long lastTime;
+
 double Input, Output, Setpoint;
-double errSum, lastErr;
-double kp=4.0;
-double ki=1.0;
-double kd=0;
+double errSum, lastErr, lastOutput;
+double kp=4.0F;
+double ki=1.0F;
+double kd=0.001F;
 
 void setup() {
   Serial.begin(115200);
@@ -55,14 +56,16 @@ void loop() {
     }
 
   }
-  processVariable = map(analogRead(PV_PIN),0,1023,0,100);
+  processVariable = map(analogRead(PV_PIN),0,1023,0,1000);
   Input = processVariable;
 
   // manipulated = map(setpoint,0,100,0,255);
+  
+  msgPrint(setpoint, Output, processVariable);
 
+  Output = map(Output,0,1000,0,255);
   Output = constrain(Output,0,255);
   analogWrite(OUTPUT_PIN, Output);
-  msgPrint(setpoint, Output, processVariable);
   Compute();
   delay(100);
 }
@@ -79,19 +82,21 @@ void msgPrint(int setpoint, int manipulated,int PV){
   Serial.print(PV);
   Serial.print(",");
   // Serial.print("error:");
-  error = setpoint - PV;
-  Serial.print(error);
+  error = setpoint - manipulated;
+  Serial.print(error+setpoint);
   Serial.println(" ");
 }
 
 void Compute(){
   unsigned long now = millis();
-  double timeChange = (double)(now - lastTime);
-  timeChange /= 100.0;
-  double error = Setpoint - Input;
-  errSum += (error * timeChange);
-  double dErr = (error - lastErr) / timeChange;
-  Output = kp * error + ki * errSum + kd * dErr;
-  lastErr = error;
-  lastTime = now;
+  double timeSample = (double)(now - lastTime); //time interval
+  timeSample /= 1000.0F;
+  lastOutput = Output; // salva o ultimo erro para adicionar no valor da saida
+  double error = Setpoint - Input; //erro 
+  errSum += (error * timeSample); // somatoria do erro (integral do erro)
+  double dErr = (error - lastErr) / timeSample; //diferença do erro (derivada do erro)  
+  Output = (lastOutput) +  ((kp * error) + (ki * errSum) + (kd * dErr)); 
+  // Saida = ganho Direto + ganho itegral * integral do erro + ganho derivada + derivada do erro
+  lastErr = error; //atualiza o erro
+  lastTime = now; //atualiza o ultimo tempo
 }
