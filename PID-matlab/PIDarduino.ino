@@ -13,10 +13,11 @@ int manipulated = 0;
 int processVariable = 0;
 
 unsigned long lastTime;
+
 double Input, Output, Setpoint;
-double errSum, lastErr;
+double errSum, lastErr, lastOutput;
 double kp=4.0F;
-double ki=1.0F*kp;
+double ki=1.0F;
 double kd=0.001F;
 
 void setup() {
@@ -82,7 +83,7 @@ void msgPrint(int setpoint, int manipulated,int PV){
   Serial.print(",");
   // Serial.print("error:");
   error = setpoint - manipulated;
-  Serial.print(error);
+  Serial.print(error+setpoint);
   Serial.println(" ");
 }
 
@@ -90,10 +91,11 @@ void Compute(){
   unsigned long now = millis();
   double timeSample = (double)(now - lastTime); //time interval
   timeSample /= 1000.0F;
+  lastOutput = Output; // salva o ultimo erro para adicionar no valor da saida
   double error = Setpoint - Input; //erro 
   errSum += (error * timeSample); // somatoria do erro (integral do erro)
   double dErr = (error - lastErr) / timeSample; //diferença do erro (derivada do erro)  
-  Output = kp * error + ki * errSum + kd * dErr; 
+  Output = (lastOutput) +  ((kp * error) + (ki * errSum) + (kd * dErr)); 
   // Saida = ganho Direto + ganho itegral * integral do erro + ganho derivada + derivada do erro
   lastErr = error; //atualiza o erro
   lastTime = now; //atualiza o ultimo tempo
