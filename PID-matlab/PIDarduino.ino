@@ -16,7 +16,7 @@ unsigned long lastTime;
 double Input, Output, Setpoint;
 double errSum, lastErr;
 double kp=4.0F;
-double ki=1.0F;
+double ki=1.0F*kp;
 double kd=0.001F;
 
 void setup() {
@@ -88,11 +88,11 @@ void msgPrint(int setpoint, int manipulated,int PV){
 
 void Compute(){
   unsigned long now = millis();
-  double timeChange = (double)(now - lastTime); //time interval
-  timeChange /= 1000.0F;
+  double timeSample = (double)(now - lastTime); //time interval
+  timeSample /= 1000.0F;
   double error = Setpoint - Input; //erro 
-  errSum += (error * timeChange); // somatoria do erro (integral do erro)
-  double dErr = (error - lastErr) / timeChange; //diferença do erro (derivada do erro)  
+  errSum += (error * timeSample); // somatoria do erro (integral do erro)
+  double dErr = (error - lastErr) / timeSample; //diferença do erro (derivada do erro)  
   Output = kp * error + ki * errSum + kd * dErr; 
   // Saida = ganho Direto + ganho itegral * integral do erro + ganho derivada + derivada do erro
   lastErr = error; //atualiza o erro
