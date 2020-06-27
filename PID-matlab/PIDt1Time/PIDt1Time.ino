@@ -1,9 +1,14 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
 #define SETPOINT_PIN A5
 #define PV_PIN A4
 #define OUTPUT_PIN 11
 
+#define TimerLoader 45535 // calculo dentro do setupTimer1()
 
 void msgPrint(int setpoint, int manipulated, int PV);
+void setupTimer1();
 
 char serialRX;
 String mydata;
@@ -26,6 +31,8 @@ void setup() {
   pinMode(SETPOINT_PIN, INPUT);
   pinMode(PV_PIN, INPUT);
   pinMode(OUTPUT_PIN, OUTPUT);
+
+  setupTimer1();
 
   Serial.print("SP:");
   Serial.print(",");
@@ -56,18 +63,9 @@ void loop() {
     }
 
   }
-  processVariable = map(analogRead(PV_PIN),0,1023,0,1000);
-  Input = processVariable;
-
-  // manipulated = map(setpoint,0,100,0,255);
   
   msgPrint(setpoint, Output, processVariable);
-
-  Output = map(Output,0,1000,0,255);
-  Output = constrain(Output,0,255);
-  analogWrite(OUTPUT_PIN, Output);
-  Compute();
-  delay(100);
+  delay(10);
 }
 
 void msgPrint(int setpoint, int manipulated,int PV){
@@ -99,4 +97,48 @@ void Compute(){
   // Saida = ganho Direto + ganho itegral * integral do erro + ganho derivada + derivada do erro
   lastErr = error; //atualiza o erro
   lastTime = now; //atualiza o ultimo tempo
+}
+
+void setupTimer1(){
+  //carregar o timer para rodar a cada 10ms
+  /*
+    F_CPU = 16.000.000 -> prescale = 8
+    16000000/8 -> fTimer1 = 2.000.000 hz
+    peridoTimer1 = 1/fTimer -> 0,0000005 segundos
+    Periodo desejado = 0.01;
+    contador = perido desejado / periodoTimer1
+    contador = 0.01/0.0000005 -> contador = 20000
+    diferença para overflow do timer de 16bits
+    65535 - contador
+
+    TimerLoader = 65535 - 20000 = 45535
+    TimerLoader = 45535; 
+  */
+
+  cli(); // disable global interrupts
+
+  TCCR1A = 0; // clear TCCR1A
+  TCCR1B = 0; // clear TCCR1B
+
+  TIMSK1 = (1 << TOIE1); // enable overflow interrupt
+  TCCR1B |= (1 << CS10); // set prescale to F_CPU/8
+  TCNT1 = TimerLoader; // pre load timer counter
+
+  sei(); // enable global interrupts
+}
+
+ISR(TIMER1_OVF_vect) {
+  TCNT1 = TimerLoader; 
+
+  processVariable = map(analogRead(PV_PIN),0,1023,0,1000);
+  Input = processVariable;
+
+  // manipulated = map(setpoint,0,100,0,255);
+  
+
+
+  Output = map(Output,0,1000,0,255);
+  Output = constrain(Output,0,255);
+  analogWrite(OUTPUT_PIN, Output);
+  Compute();
 }
