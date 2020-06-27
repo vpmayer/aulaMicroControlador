@@ -72,19 +72,21 @@ void loop() {
   delay(100);
 }
 
-void msgPrint(int setpoint, int manipulated,int processVariable){
+void msgPrint(int setpoint, int manipulated,int PV){
   int error;
   // Serial.print("SP:");
   Serial.print(setpoint);
   Serial.print(",");
   // Serial.print("MV:");
+  // Serial.print(0);
   Serial.print(manipulated);
   Serial.print(",");
   // Serial.print("PV:");
-  Serial.print(processVariable);
+  Serial.print(PV);
   Serial.print(",");
   // Serial.print("error:");
   error = setpoint - manipulated;
+  // Serial.print(0);
   Serial.print(error);
   Serial.println(" ");
 }
@@ -148,12 +150,6 @@ void setupPID(double kp, double ki, double kd){
   ganhos[1] = -kp + ((ki*Tsample)/2.0F) - ((2.0F*kd)/Tsample);
 
   ganhos[2] = kd/Tsample;
-
-  // ganhos[0] = kp + ((ki)/2.0F) + (kd);
-
-  // ganhos[1] = -kp + ((ki)/2.0F) - ((2.0F*kd));
-
-  // ganhos[2] = kd;
 
   for(int i=0;i<3;i++){
     errors[i]=0;

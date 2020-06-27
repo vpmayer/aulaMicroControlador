@@ -65,7 +65,7 @@ void loop() {
   }
   
   msgPrint(setpoint, Output, processVariable);
-  delay(10);
+  delay(100);
 }
 
 void msgPrint(int setpoint, int manipulated,int PV){
@@ -74,6 +74,7 @@ void msgPrint(int setpoint, int manipulated,int PV){
   Serial.print(setpoint);
   Serial.print(",");
   // Serial.print("MV:");
+  // Serial.print(0);
   Serial.print(manipulated);
   Serial.print(",");
   // Serial.print("PV:");
@@ -81,7 +82,8 @@ void msgPrint(int setpoint, int manipulated,int PV){
   Serial.print(",");
   // Serial.print("error:");
   error = setpoint - manipulated;
-  Serial.print(error+setpoint);
+  // Serial.print(0);
+  Serial.print(error);
   Serial.println(" ");
 }
 
