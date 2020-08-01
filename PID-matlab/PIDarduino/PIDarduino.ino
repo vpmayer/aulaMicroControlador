@@ -67,7 +67,7 @@ void loop() {
   Output = constrain(Output,0,255);
   analogWrite(OUTPUT_PIN, Output);
   Compute();
-  delay(100);
+  delay(99);
 }
 
 void msgPrint(int setpoint, int manipulated,int PV){
